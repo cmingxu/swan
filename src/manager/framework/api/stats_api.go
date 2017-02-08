@@ -1,18 +1,19 @@
 package api
 
 import (
+	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/Dataman-Cloud/swan/src/apiserver"
 	"github.com/Dataman-Cloud/swan/src/apiserver/metrics"
 	"github.com/Dataman-Cloud/swan/src/config"
 	"github.com/Dataman-Cloud/swan/src/manager/framework/mesos_connector"
 	"github.com/Dataman-Cloud/swan/src/manager/framework/scheduler"
 	"github.com/Dataman-Cloud/swan/src/types"
+
 	"github.com/andygrunwald/megos"
 	"github.com/emicklei/go-restful"
-
-	"fmt"
-	"net/url"
-	"strings"
 )
 
 type StatsService struct {
