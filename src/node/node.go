@@ -101,7 +101,10 @@ func NewNode(config config.SwanConfig) (*Node, error) {
 func loadOrCreateNodeID(swanConfig config.SwanConfig) (string, error) {
 	nodeIDFile := swanConfig.DataDir + NodeIDFileName
 	if !fileutil.Exist(nodeIDFile) {
-		os.MkdirAll(swanConfig.DataDir, 0700)
+		err := os.MkdirAll(swanConfig.DataDir, 0755)
+		if err != nil {
+			return "", err
+		}
 
 		nodeID := uuid.NewV4().String()
 		idFile, err := os.OpenFile(nodeIDFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)

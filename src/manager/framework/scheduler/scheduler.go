@@ -67,30 +67,28 @@ func (scheduler *Scheduler) Stop() {
 
 // revive from crash or rotate from leader change
 func (scheduler *Scheduler) Start(ctx context.Context) error {
-	if !swancontext.Instance().Config.NoRecover {
-		apps, err := state.LoadAppData(scheduler.UserEventChan)
-		if err != nil {
-			return err
-		}
+	apps, err := state.LoadAppData(scheduler.UserEventChan)
+	if err != nil {
+		return err
+	}
 
-		for _, app := range apps {
-			scheduler.AppStorage.Add(app.ID, app)
+	for _, app := range apps {
+		scheduler.AppStorage.Add(app.ID, app)
 
-			for _, slot := range app.GetSlots() {
-				if slot.StateIs(state.SLOT_STATE_PENDING_OFFER) {
-					state.OfferAllocatorInstance().PutSlotBackToPendingQueue(slot) // push the slot into pending offer queue
-				}
+		for _, slot := range app.GetSlots() {
+			if slot.StateIs(state.SLOT_STATE_PENDING_OFFER) {
+				state.OfferAllocatorInstance().PutSlotBackToPendingQueue(slot) // push the slot into pending offer queue
 			}
 		}
+	}
 
-		list, err := state.LoadOfferAllocatorMap()
-		if err != nil {
-			return err
-		}
+	list, err := state.LoadOfferAllocatorMap()
+	if err != nil {
+		return err
+	}
 
-		for k, v := range list {
-			state.OfferAllocatorInstance().BySlotId[k] = v
-		}
+	for k, v := range list {
+		state.OfferAllocatorInstance().BySlotId[k] = v
 	}
 
 	go func() {

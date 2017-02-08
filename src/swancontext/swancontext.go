@@ -1,6 +1,8 @@
 package swancontext
 
 import (
+	"sync"
+
 	"github.com/Dataman-Cloud/swan/src/apiserver"
 	"github.com/Dataman-Cloud/swan/src/config"
 	"github.com/Dataman-Cloud/swan/src/event"
@@ -9,6 +11,7 @@ import (
 )
 
 var instance *SwanContext
+var once sync.Once
 
 type SwanContext struct {
 	Config    config.SwanConfig
@@ -17,12 +20,14 @@ type SwanContext struct {
 }
 
 func NewSwanContext(c config.SwanConfig, eventBus *event.EventBus) *SwanContext {
-	instance = &SwanContext{
-		Config:   c,
-		EventBus: eventBus,
-	}
+	once.Do(func() {
+		instance = &SwanContext{
+			Config:   c,
+			EventBus: eventBus,
+		}
 
-	instance.ApiServer = apiserver.NewApiServer(c.ListenAddr)
+		instance.ApiServer = apiserver.NewApiServer(c.ListenAddr)
+	})
 
 	return instance
 }

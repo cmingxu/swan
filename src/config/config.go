@@ -15,7 +15,6 @@ type SwanConfig struct {
 	LogLevel          string   `json:"logLevel"`
 	Mode              SwanMode `json:"mode"` // manager, agent, mixed
 	DataDir           string   `json:"dataDir"`
-	NoRecover         bool     `json:"noRecover"`
 	Domain            string   `json:"domain"`
 	RaftAdvertiseAddr string   `json:"raftAdvertiseAddr"`
 	RaftListenAddr    string   `json:"raftListenAddr"`
@@ -66,14 +65,13 @@ func NewConfig(c *cli.Context) (SwanConfig, error) {
 		LogLevel:       "info",
 		Mode:           Mixed,
 		DataDir:        "./data/",
-		NoRecover:      false,
 		Domain:         "swan.com",
 		ListenAddr:     "0.0.0.0:9999",
 		RaftListenAddr: "0.0.0.0:2111",
 		JoinAddrs:      []string{"0.0.0.0:9999"},
 
 		Scheduler: Scheduler{
-			ZkPath:             "0.0.0.0:2181",
+			ZkPath:             "zk://0.0.0.0:2181",
 			MesosFrameworkUser: "root",
 			Hostname:           hostname(),
 		},

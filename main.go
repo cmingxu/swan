@@ -30,7 +30,7 @@ func setupLogger(logLevel string) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "swan"
-	app.Usage = "A general purpose mesos framework"
+	app.Usage = "A Mesos framework for long running docker container"
 	app.Version = version.Version
 
 	app.Flags = []cli.Flag{
