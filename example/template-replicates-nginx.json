@@ -8,8 +8,7 @@
   "runAs": "xcm",
   "priority": 100,
   "instances": 3,
-  "constraints": [
-  ],
+  "constraints": "like hostname \"192\"",
   "container": {
     "docker": {
       "image": "nginx:1.10",

@@ -8,7 +8,7 @@
   "runAs": "xcm",
   "priority": 100,
   "instances": 3,
-  "constraints": "unique hostname",
+  "constraints": "and (unique hostname) (like hostname  \"192\")",
   "container": {
     "docker": {
       "image": "wordpress",
