@@ -107,6 +107,14 @@ func NewSlot(app *App, version *types.Version, index int) *Slot {
 		slot.Ip = app.CurrentVersion.IP[index]
 	}
 
+	slot.SetRestartPolicy()
+
+	slot.create()
+
+	return slot
+}
+
+func (slot *Slot) SetRestartPolicy() {
 	// initialize restart policy
 	testAndRestartFunc := func(s *Slot) bool {
 		if slot.Abnormal() {
@@ -120,10 +128,6 @@ func NewSlot(app *App, version *types.Version, index int) *Slot {
 	//slot.restartPolicy = NewRestartPolicy(slot, slot.Version.BackoffSeconds,
 	//slot.Version.BackoffFactor, slot.Version.MaxLaunchDelaySeconds, testAndRestartFunc)
 	slot.restartPolicy = NewRestartPolicy(slot, time.Second*10, 1, time.Second*300, testAndRestartFunc)
-
-	slot.create()
-
-	return slot
 }
 
 // kill task doesn't need cleanup slot from app.Slots

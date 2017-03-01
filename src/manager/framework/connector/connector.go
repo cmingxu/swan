@@ -59,8 +59,8 @@ func Instance() *Connector {
 				Name:      proto.String("swan"),
 				Principal: proto.String("swan"),
 
-				FailoverTimeout: proto.Float64(60 * 60 * 24 * 7),
-				Checkpoint:      proto.Bool(true),
+				FailoverTimeout: proto.Float64(60 * 60 * 24), // swan tasks got killed after 1 day
+				Checkpoint:      proto.Bool(true),            // enable checkpont after executor exit
 				Hostname:        proto.String(hostname),
 			}
 

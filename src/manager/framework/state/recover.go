@@ -101,6 +101,8 @@ func LoadAppSlots(app *App) ([]*Slot, error) {
 		// TODO yaoyun
 		slot.Version = app.CurrentVersion
 
+		slot.SetRestartPolicy()
+
 		slots = append(slots, slot)
 	}
 
