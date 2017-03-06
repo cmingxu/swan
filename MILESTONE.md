@@ -48,5 +48,6 @@ milestones we set ahead.
 
   - **[IMPROVE]** revisit janitor
   - **[IMPROVE]** revisit dns
+  - **[IMPROVE]** add config info for DNS & Janitor for agent
 
 
