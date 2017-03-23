@@ -53,7 +53,7 @@ func (cancelUpdate *StateCancelUpdate) Step() {
 		cancelUpdate.CurrentSlot.Abnormal()) &&
 		cancelUpdate.CurrentSlotIndex > cancelUpdate.TargetSlotIndex {
 
-		logrus.Infof("archive current task")
+		logrus.Debug("archive current task")
 		cancelUpdate.CurrentSlot.Archive()
 		cancelUpdate.CurrentSlot.DispatchNewTask(cancelUpdate.App.CurrentVersion)
 
@@ -72,7 +72,7 @@ func (cancelUpdate *StateCancelUpdate) Step() {
 		cancelUpdate.CurrentSlot.Abnormal()) &&
 		cancelUpdate.CurrentSlotIndex == cancelUpdate.TargetSlotIndex {
 
-		logrus.Infof("archive current task")
+		logrus.Debug("archive current task")
 		cancelUpdate.CurrentSlot.Archive()
 		cancelUpdate.CurrentSlot.DispatchNewTask(cancelUpdate.App.CurrentVersion)
 
@@ -84,7 +84,7 @@ func (cancelUpdate *StateCancelUpdate) Step() {
 		cancelUpdate.App.TransitTo(APP_STATE_NORMAL)
 
 	} else {
-		logrus.Info("state cancelUpdate step, do nothing")
+		logrus.Debug("state cancelUpdate step, do nothing")
 	}
 }
 

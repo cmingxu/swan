@@ -55,7 +55,7 @@ func (scaleUp *StateScaleUp) Step() {
 
 		scaleUp.lock.Unlock()
 	} else {
-		logrus.Info("state scaleUp step, do nothing")
+		logrus.Debug("state scaleUp step, do nothing")
 	}
 }
 

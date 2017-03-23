@@ -72,7 +72,7 @@ func (deleting *StateDeleting) Step() {
 
 		deleting.lock.Unlock()
 	} else {
-		logrus.Info("state deleting step, do nothing")
+		logrus.Debug("state deleting step, do nothing")
 	}
 
 }

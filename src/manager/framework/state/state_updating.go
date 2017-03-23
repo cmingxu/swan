@@ -68,7 +68,7 @@ func (updating *StateUpdating) Step() {
 		updating.CurrentSlot.Abnormal()) &&
 		updating.CurrentSlotIndex <= updating.TargetSlotIndex {
 
-		logrus.Infof("archive current task")
+		logrus.Debug("archive current task")
 		updating.CurrentSlot.Archive()
 		updating.CurrentSlot.DispatchNewTask(updating.App.ProposedVersion)
 
@@ -96,7 +96,7 @@ func (updating *StateUpdating) Step() {
 			logrus.Debug("state updating step, updating done,  not all slots updated")
 		}
 	} else {
-		logrus.Info("state updating step, do nothing")
+		logrus.Debug("state updating step, do nothing")
 	}
 }
 

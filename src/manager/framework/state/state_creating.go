@@ -32,8 +32,8 @@ func (creating *StateCreating) OnEnter() {
 	creating.TargetSlotIndex = int(creating.App.CurrentVersion.Instances) - 1
 
 	creating.CurrentSlot = NewSlot(creating.App, creating.App.CurrentVersion, creating.CurrentSlotIndex)
-	creating.App.SetSlot(creating.CurrentSlotIndex, creating.CurrentSlot)
 	creating.CurrentSlot.DispatchNewTask(creating.CurrentSlot.Version)
+	creating.App.SetSlot(creating.CurrentSlotIndex, creating.CurrentSlot)
 }
 
 func (creating *StateCreating) OnExit() {
@@ -55,7 +55,7 @@ func (creating *StateCreating) Step() {
 
 		creating.lock.Unlock()
 	} else {
-		logrus.Info("state creating step, do nothing")
+		logrus.Debug("state creating step, do nothing")
 	}
 }
 
