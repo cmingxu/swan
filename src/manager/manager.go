@@ -14,7 +14,7 @@ import (
 	"github.com/Dataman-Cloud/swan/src/event"
 	eventbus "github.com/Dataman-Cloud/swan/src/event"
 	"github.com/Dataman-Cloud/swan/src/manager/framework"
-	fstore "github.com/Dataman-Cloud/swan/src/manager/framework/store"
+	frameworkStore "github.com/Dataman-Cloud/swan/src/manager/framework/store"
 	"github.com/Dataman-Cloud/swan/src/manager/raft"
 	raftstore "github.com/Dataman-Cloud/swan/src/manager/raft/store"
 	"github.com/Dataman-Cloud/swan/src/types"
@@ -45,22 +45,23 @@ type Manager struct {
 }
 
 func New(nodeID string, managerConf config.ManagerConfig) (*Manager, error) {
-	DBDir := filepath.Join(managerConf.DataDir, nodeID)
-	DBPath := filepath.Join(DBDir, "swan.db")
+	nodeDataDir := filepath.Join(managerConf.DataDir, nodeID)
+	boltDbPath := filepath.Join(nodeDataDir, "swan.db")
 
 	var nodeInfo types.Node
-	var boltDB *raftstore.BoltbDb
+	var raftStore *raftstore.BoltbDb
 	var err error
 
-	if fileutil.Exist(DBPath) {
-		nodeInfo, boltDB, err = loadNode(nodeID, DBPath)
+	if fileutil.Exist(boltDbPath) {
+		nodeInfo, raftStore, err = recoverNodeData(nodeID, boltDbPath)
 	} else {
-		if err := os.MkdirAll(DBDir, 0700); err != nil {
+		if err := os.MkdirAll(nodeDataDir, 0700); err != nil {
 			return nil, err
 		}
 
-		nodeInfo, boltDB, err = initNode(nodeID, DBPath, managerConf)
+		nodeInfo, raftStore, err = initNodeData(nodeID, boltDbPath, managerConf)
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -68,10 +69,10 @@ func New(nodeID string, managerConf config.ManagerConfig) (*Manager, error) {
 	raftNodeOpts := raft.NodeOptions{
 		RaftID:        nodeInfo.RaftID,
 		SwanNodeID:    nodeID,
-		DataDir:       DBDir,
+		DataDir:       nodeDataDir,
 		ListenAddr:    nodeInfo.RaftListenAddr,
 		AdvertiseAddr: nodeInfo.RaftAdvertiseAddr,
-		DB:            boltDB,
+		DB:            raftStore,
 	}
 	raftNode, err := raft.NewNode(raftNodeOpts)
 	if err != nil {
@@ -81,8 +82,7 @@ func New(nodeID string, managerConf config.ManagerConfig) (*Manager, error) {
 
 	managerServer := apiserver.NewApiServer(managerConf.ListenAddr, managerConf.AdvertiseAddr)
 
-	frameworkStore := fstore.NewStore(boltDB.DB, raftNode)
-	framework, err := framework.New(frameworkStore, managerServer)
+	framework, err := framework.New(frameworkStore.NewStore(raftStore.DB, raftNode), managerServer)
 	if err != nil {
 		logrus.Errorf("init framework failed. Error: ", err.Error())
 		return nil, err
@@ -105,9 +105,9 @@ func New(nodeID string, managerConf config.ManagerConfig) (*Manager, error) {
 	return manager, nil
 }
 
-func loadNode(nodeID string, DBPath string) (types.Node, *raftstore.BoltbDb, error) {
+func recoverNodeData(nodeID string, boltDbPath string) (types.Node, *raftstore.BoltbDb, error) {
 	var nodeInfo types.Node
-	db, err := bolt.Open(DBPath, 0644, nil)
+	db, err := bolt.Open(boltDbPath, 0644, nil)
 	if err != nil {
 		return nodeInfo, nil, err
 	}
@@ -119,14 +119,14 @@ func loadNode(nodeID string, DBPath string) (types.Node, *raftstore.BoltbDb, err
 		return nodeInfo, nil, err
 	}
 
-	nodeInfo = converRaftTypeNodeToNode(*nodeMetadata)
+	nodeInfo = RaftTypeNodeToNode(*nodeMetadata)
 
 	return nodeInfo, boltDb, nil
 }
 
-func initNode(nodeID string, DBPath string, managerConf config.ManagerConfig) (types.Node, *raftstore.BoltbDb, error) {
+func initNodeData(nodeID string, boltDbPath string, managerConf config.ManagerConfig) (types.Node, *raftstore.BoltbDb, error) {
 	var nodeInfo types.Node
-	boltDB, err := bolt.Open(DBPath, 0644, nil)
+	boltDb, err := bolt.Open(boltDbPath, 0644, nil)
 	if err != nil {
 		return nodeInfo, nil, err
 	}
@@ -141,9 +141,9 @@ func initNode(nodeID string, DBPath string, managerConf config.ManagerConfig) (t
 		RaftID:            uint64(rand.Int63()) + 1,
 	}
 
-	boltDBStore := raftstore.NewBoltbdStore(boltDB)
+	boltDbStore := raftstore.NewBoltbdStore(boltDb)
 
-	return nodeInfo, boltDBStore, nil
+	return nodeInfo, boltDbStore, nil
 }
 
 func (manager *Manager) Stop() {

@@ -170,14 +170,10 @@ func (apiServer *ApiServer) Proxy() restful.FilterFunction {
 
 		r := req.Request
 
-		leaderUrl, err := url.Parse(apiServer.leaderAddr + r.URL.Path)
+		leaderUrl, err := url.Parse("http://" + apiServer.leaderAddr + r.URL.Path)
 		if err != nil {
 			http.Error(resp, err.Error(), http.StatusInternalServerError)
 			return
-		}
-
-		if leaderUrl.Scheme == "" {
-			leaderUrl.Scheme = "http"
 		}
 
 		rr, err := http.NewRequest(r.Method, leaderUrl.String(), r.Body)

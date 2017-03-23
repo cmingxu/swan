@@ -73,7 +73,7 @@ func FlagRaftListenAddr() cli.Flag {
 		Name:   "raft-listen-addr",
 		Usage:  "swan raft serverlistener address",
 		EnvVar: "SWAN_RAFT_LISTEN_ADDR",
-		Value:  "http://0.0.0.0:2111",
+		Value:  "0.0.0.0:2111",
 	}
 }
 
@@ -251,7 +251,7 @@ func ManagerJoinCmd() cli.Command {
 		Usage:       "join [ARG...]",
 		Description: "start a manager and join to an exitsing swan cluster",
 		Flags:       []cli.Flag{},
-		Action:      JoinAndStartManager,
+		Action:      JoinManager,
 	}
 
 	managerJoinCmd.Flags = append(managerJoinCmd.Flags, FlagListenAddr())
@@ -266,7 +266,7 @@ func ManagerJoinCmd() cli.Command {
 	return managerJoinCmd
 }
 
-func JoinAndStartManager(c *cli.Context) error {
+func JoinManager(c *cli.Context) error {
 	conf := config.NewManagerConfig(c)
 	IDFilePath := path.Join(conf.DataDir, IDFileName)
 	ID, err := utils.LoadNodeID(IDFilePath)
@@ -283,13 +283,13 @@ func JoinAndStartManager(c *cli.Context) error {
 
 	setupLogger(conf.LogLevel)
 
-	managerNode, err := manager.New(ID, conf)
+	m, err := manager.New(ID, conf)
 	if err != nil {
 		logrus.Error("Node initialization failed")
 		return err
 	}
 
-	if err := managerNode.JoinAndStart(context.TODO()); err != nil {
+	if err := m.JoinAndStart(context.TODO()); err != nil {
 		logrus.Errorf("start node failed. Error: %s", err.Error())
 		return err
 	}
@@ -334,13 +334,13 @@ func StartManager(c *cli.Context) error {
 
 	setupLogger(conf.LogLevel)
 
-	managerNode, err := manager.New(ID, conf)
+	m, err := manager.New(ID, conf)
 	if err != nil {
 		logrus.Error("Node initialization failed")
 		return err
 	}
 
-	if err := managerNode.InitAndStart(context.TODO()); err != nil {
+	if err := m.InitAndStart(context.TODO()); err != nil {
 		logrus.Errorf("start node failed. Error: %s", err.Error())
 		return err
 	}

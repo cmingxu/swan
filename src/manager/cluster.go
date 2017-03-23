@@ -85,7 +85,7 @@ func (manager *Manager) GetNodes() []types.Node {
 	}
 
 	for _, nodeMetadata := range nodes_ {
-		nodes = append(nodes, converRaftTypeNodeToNode(*nodeMetadata))
+		nodes = append(nodes, RaftTypeNodeToNode(*nodeMetadata))
 	}
 
 	return nodes
@@ -204,7 +204,7 @@ func (manager *Manager) LoadNodeData() error {
 }
 
 func (manager *Manager) presistNodeData(node types.Node) error {
-	nodeMetadata := converNodeToRaftTypeNode(node)
+	nodeMetadata := NodeToRaftTypeNode(node)
 
 	storeActions := []*rafttypes.StoreAction{&rafttypes.StoreAction{
 		Action: rafttypes.StoreActionKindCreate,
@@ -243,7 +243,7 @@ func (manager *Manager) SendAgentInitData(agent types.Node) {
 	}
 }
 
-func converRaftTypeNodeToNode(rafttypesNode rafttypes.Node) types.Node {
+func RaftTypeNodeToNode(rafttypesNode rafttypes.Node) types.Node {
 	return types.Node{
 		ID:                rafttypesNode.ID,
 		AdvertiseAddr:     rafttypesNode.AdvertiseAddr,
@@ -258,7 +258,7 @@ func converRaftTypeNodeToNode(rafttypesNode rafttypes.Node) types.Node {
 
 }
 
-func converNodeToRaftTypeNode(node types.Node) rafttypes.Node {
+func NodeToRaftTypeNode(node types.Node) rafttypes.Node {
 	return rafttypes.Node{
 		ID:                node.ID,
 		AdvertiseAddr:     node.AdvertiseAddr,

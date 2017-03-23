@@ -183,6 +183,7 @@ func NewManagerConfig(c *cli.Context) ManagerConfig {
 		// Leading double slashes (any scheme). Force http.
 		managerConfig.RaftListenAddr = "http:" + managerConfig.RaftListenAddr
 	}
+
 	if strings.Index(managerConfig.RaftListenAddr, "://") == -1 {
 		// Missing scheme. Force http.
 		managerConfig.RaftListenAddr = "http://" + managerConfig.RaftListenAddr
