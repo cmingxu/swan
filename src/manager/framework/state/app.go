@@ -39,8 +39,8 @@ type App struct {
 	Name     string           `json:"name"`
 	Versions []*types.Version `json:"versions"`
 
-	slotsLock sync.Mutex
-	Slots     map[int]*Slot `json:"slots"`
+	slotMu sync.RWMutex
+	Slots  map[int]*Slot `json:"slots"`
 
 	// app run with CurrentVersion config
 	CurrentVersion *types.Version `json:"current_version"`
@@ -307,9 +307,9 @@ func (app *App) RemoveSlot(index int) {
 		OfferAllocatorInstance().RemoveSlotFromAllocator(slot)
 		slot.Remove()
 
-		app.slotsLock.Lock()
+		app.slotMu.Lock()
 		delete(app.Slots, index)
-		app.slotsLock.Unlock()
+		app.slotMu.Unlock()
 
 		app.Touch()
 	}
@@ -342,6 +342,8 @@ func (app *App) stateFactory(stateName string, args ...interface{}) State {
 }
 
 func (app *App) GetSlots() []*Slot {
+	app.slotMu.RLock()
+	defer app.slotMu.RUnlock()
 	slots := make([]*Slot, 0)
 	for _, v := range app.Slots {
 		slots = append(slots, v)
@@ -354,14 +356,17 @@ func (app *App) GetSlots() []*Slot {
 }
 
 func (app *App) GetSlot(index int) (*Slot, bool) {
+	app.slotMu.RLock()
+	defer app.slotMu.RUnlock()
+
 	slot, ok := app.Slots[index]
 	return slot, ok
 }
 
 func (app *App) SetSlot(index int, slot *Slot) {
-	app.slotsLock.Lock()
+	app.slotMu.Lock()
 	app.Slots[index] = slot
-	app.slotsLock.Unlock()
+	app.slotMu.Unlock()
 
 	app.Touch()
 }
