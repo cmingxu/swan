@@ -405,6 +405,10 @@ func validateAndFormatVersion(version *types.Version) error {
 		return errors.New("image field required")
 	}
 
+	if version.Container.Docker.Network == "" {
+		return errors.New("network field required")
+	}
+
 	if n := len(version.AppName); n == 0 || n > 48 {
 		return errors.New("invalid appName: appName empty or too long")
 	}
